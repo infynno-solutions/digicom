@@ -8,7 +8,6 @@ services:
       - "2181:2181"
     networks:
       - digicom
-
   kafka:
     image: wurstmeister/kafka:latest
     container_name: digicom_kafka
@@ -36,7 +35,19 @@ services:
       DYNAMIC_CONFIG_ENABLED: "true"
     networks:
       - digicom
-
+  db:
+    image: postgres:latest
+    container_name: digicom_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_USER: "admin"
+      POSTGRES_DB: "digicom"
+    volumes:
+      - /data/postgres:/data/postgres
+    networks:
+      - digicom
 networks:
   digicom:
     driver: bridge

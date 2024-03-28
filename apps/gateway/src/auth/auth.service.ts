@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientKafka } from '@nestjs/microservices';
+import { ClientKafka, RpcException } from '@nestjs/microservices';
 import { CreateUserDto } from '@repo/shared';
+import { catchError, throwError } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +10,7 @@ export class AuthService {
   ) {}
 
   async onModuleInit() {
-    this.authClient.subscribeToResponseOf('create_user');
+    this.authClient.subscribeToResponseOf('create-user');
     await this.authClient.connect();
   }
 
@@ -18,6 +19,12 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto): Promise<any> {
-    return this.authClient.send('create_user', JSON.stringify(createUserDto));
+    return this.authClient
+      .send('create-user', JSON.stringify(createUserDto))
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
   }
 }

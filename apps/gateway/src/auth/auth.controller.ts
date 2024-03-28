@@ -7,7 +7,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from '@repo/shared';
+import {
+  CreateUserDto,
+  LoginUserDto,
+  ForgotPasswordDto,
+  ChangePasswordDto,
+} from '@repo/shared';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { IRequestWithUser } from './auth.interface';
@@ -35,5 +40,15 @@ export class AuthController {
   @Get('me')
   me(@Req() req: IRequestWithUser) {
     return { message: 'Success', user: req.user };
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('change-password')
+  changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(changePasswordDto);
   }
 }

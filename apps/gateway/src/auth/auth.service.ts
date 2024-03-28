@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka, RpcException } from '@nestjs/microservices';
-import { CreateUserDto, LoginUserDto } from '@repo/shared';
+import {
+  ChangePasswordDto,
+  CreateUserDto,
+  ForgotPasswordDto,
+  LoginUserDto,
+} from '@repo/shared';
 import { catchError, throwError } from 'rxjs';
 
 @Injectable()
@@ -13,6 +18,8 @@ export class AuthService {
     this.authClient.subscribeToResponseOf('create-user');
     this.authClient.subscribeToResponseOf('login-user');
     this.authClient.subscribeToResponseOf('verify-email');
+    this.authClient.subscribeToResponseOf('forgot-password');
+    this.authClient.subscribeToResponseOf('change-password');
     await this.authClient.connect();
   }
 
@@ -43,6 +50,26 @@ export class AuthService {
   async verify(token: string): Promise<any> {
     return this.authClient
       .send('verify-email', JSON.stringify({ token }))
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<any> {
+    return this.authClient
+      .send('forgot-password', JSON.stringify(forgotPasswordDto))
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto): Promise<any> {
+    return this.authClient
+      .send('change-password', JSON.stringify(changePasswordDto))
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

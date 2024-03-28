@@ -5,7 +5,12 @@ import {
   Payload,
   RpcException,
 } from '@nestjs/microservices';
-import { CreateUserDto, LoginUserDto } from '@repo/shared';
+import {
+  ChangePasswordDto,
+  CreateUserDto,
+  ForgotPasswordDto,
+  LoginUserDto,
+} from '@repo/shared';
 import { db } from '@repo/db';
 import slugify from 'slugify';
 import { nanoid } from 'nanoid';
@@ -129,7 +134,10 @@ export class AppController {
   @MessagePattern('verify-email')
   async verifyEmail(@Payload() message: { token: string }) {
     const token = await db.token.findUnique({
-      where: { token: message.token },
+      where: {
+        token: message.token,
+        type: 'EMAIL_VERIFICATION',
+      },
     });
 
     if (
@@ -145,6 +153,76 @@ export class AppController {
       where: { id: token.userId },
       data: {
         emailVerifiedAt: new Date(Date.now()),
+      },
+    });
+
+    await db.token.delete({ where: { token: message.token } });
+
+    return {
+      message: 'Success',
+    };
+  }
+
+  @MessagePattern('forgot-password')
+  async forgotPassword(@Payload() message: ForgotPasswordDto) {
+    const user = await db.user.findUnique({
+      where: {
+        email: message.email,
+      },
+    });
+
+    if (!user) {
+      throw new RpcException(new BadRequestException('User not found.'));
+    }
+
+    const token = nanoid(32);
+
+    await db.token.create({
+      data: {
+        token,
+        type: 'PASSWORD_RESET',
+        userId: user.id,
+      },
+    });
+
+    this.mailClient.emit(
+      'send-forgot-password-mail',
+      JSON.stringify({
+        to: user.email,
+        name: user.name,
+        token,
+      }),
+    );
+
+    return {
+      message: 'Success',
+    };
+  }
+
+  @MessagePattern('change-password')
+  async changePassword(@Payload() message: ChangePasswordDto) {
+    const token = await db.token.findUnique({
+      where: {
+        token: message.token,
+        type: 'PASSWORD_RESET',
+      },
+    });
+
+    if (
+      !token ||
+      (token.expiresAt !== null && token.expiresAt < new Date(Date.now()))
+    ) {
+      throw new RpcException(
+        new BadRequestException('Invalid or expired token.'),
+      );
+    }
+
+    const password = await bcrypt.hash(message.password, 12);
+
+    await db.user.update({
+      where: { id: token.userId },
+      data: {
+        password,
       },
     });
 

@@ -1,6 +1,16 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserDto, LoginUserDto } from '@repo/shared';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { IRequestWithUser } from './auth.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -19,5 +29,11 @@ export class AuthController {
   @Get('verify/:token')
   verify(@Param('token') token: string) {
     return this.authService.verify(token);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  me(@Req() req: IRequestWithUser) {
+    return { message: 'Success', user: req.user };
   }
 }

@@ -86,6 +86,7 @@ export class AppController {
         email: true,
         emailVerifiedAt: true,
         password: true,
+        username: true,
       },
     });
     if (!user) {
@@ -110,6 +111,7 @@ export class AppController {
     const userData = {
       id: user.id,
       name: user.name,
+      username: user.username,
       email: user.email,
     };
 

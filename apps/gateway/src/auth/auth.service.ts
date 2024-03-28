@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka, RpcException } from '@nestjs/microservices';
-import { CreateUserDto } from '@repo/shared';
+import { CreateUserDto, LoginUserDto } from '@repo/shared';
 import { catchError, throwError } from 'rxjs';
 
 @Injectable()
@@ -11,6 +11,8 @@ export class AuthService {
 
   async onModuleInit() {
     this.authClient.subscribeToResponseOf('create-user');
+    this.authClient.subscribeToResponseOf('login-user');
+    this.authClient.subscribeToResponseOf('verify-email');
     await this.authClient.connect();
   }
 
@@ -21,6 +23,26 @@ export class AuthService {
   async register(createUserDto: CreateUserDto): Promise<any> {
     return this.authClient
       .send('create-user', JSON.stringify(createUserDto))
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  async login(loginUserDto: LoginUserDto): Promise<any> {
+    return this.authClient
+      .send('login-user', JSON.stringify(loginUserDto))
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  async verify(token: string): Promise<any> {
+    return this.authClient
+      .send('verify-email', JSON.stringify({ token }))
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

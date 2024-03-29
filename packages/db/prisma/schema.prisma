@@ -18,6 +18,7 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   Token           Token[]
+  Product         Product[]
 }
 
 enum TokenType {
@@ -31,4 +32,53 @@ model Token {
   userId    String?
   type      TokenType
   expiresAt DateTime?
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  UNLISTED
+  PRIVATE
+}
+
+model Product {
+  id                 String            @id @default(cuid())
+  title              String
+  description        String            @db.Text
+  thumbnail          String?
+  price              Float             @default(0)
+  currency           String
+  limitQuantity      Boolean           @default(false)
+  quantity           Int               @default(0)
+  hideQuantity       Boolean           @default(false)
+  hideSales          Boolean           @default(false)
+  refundEnabled      Boolean           @default(false)
+  refundPolicy       String?           @db.Text
+  onPurchaseRedirect Boolean           @default(false)
+  redirectLink       String?
+  status             ProductStatus     @default(DRAFT)
+  user               User              @relation(fields: [userId], references: [id])
+  userId             String
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  ProductDelivery    ProductDelivery[]
+}
+
+enum DeliveryType {
+  FILE
+  EXTERNAL_LINK
+  CONTENT
+}
+
+model ProductDelivery {
+  id           String       @id @default(cuid())
+  type         DeliveryType
+  instructions String?      @db.Text
+  externalLink String?
+  content      String?      @db.Text
+  file         String?      @db.Text
+  product      Product      @relation(fields: [productId], references: [id])
+  productId    String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }

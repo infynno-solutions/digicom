@@ -16,7 +16,11 @@ export const generateBreadcrumbs = (pathname: string) => {
     crumbs.push({ title: "Dashboard", href: "/dashboard" });
   } else if (pathname === "/dashboard/products") {
     crumbs.push({ title: "Dashboard", href: "/dashboard" });
-    crumbs.push({ title: "Products", href: "/products" });
+    crumbs.push({ title: "Products", href: "/dashboard/products" });
+  } else if (pathname === "/dashboard/products/add") {
+    crumbs.push({ title: "Dashboard", href: "/dashboard" });
+    crumbs.push({ title: "Products", href: "/dashboard/products" });
+    crumbs.push({ title: "Create Product", href: "/dashboard/products/add" });
   }
 
   return (

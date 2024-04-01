@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import LoginForm from "@/components/auth/login-form";
 import {
   Card,
@@ -7,8 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getCurrentUser } from "@/lib/session";
 
-const Login = () => {
+const Login = async () => {
+  const user = await getCurrentUser();
+  if (user) {
+    return redirect("/dashboard");
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <Card className="mx-auto max-w-sm">

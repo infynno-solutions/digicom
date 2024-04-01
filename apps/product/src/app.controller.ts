@@ -18,7 +18,7 @@ export class AppController {
   @MessagePattern('create-product')
   async createProduct(
     @Payload() message: CreateProductDto & { userId: string },
-  ): Promise<any> {
+  ): Promise<{ message: string; product: any }> {
     const product = await db.product.create({ data: message });
 
     return {

@@ -9,6 +9,10 @@ export class RpcExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    response.status(error.statusCode).json(error);
+    if (error) {
+      response.status(error.statusCode).json(error);
+    } else {
+      response.status(500).json({ message: 'Something went wrong!!' });
+    }
   }
 }

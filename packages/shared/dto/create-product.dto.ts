@@ -3,7 +3,6 @@ import {
   IsIn,
   IsInt,
   IsNotEmpty,
-  IsOptional,
   IsPositive,
   IsUrl,
   MinLength,
@@ -156,34 +155,28 @@ export class CreateProductDto {
   currency: string;
 
   @IsNotEmpty()
-  @Transform(({ value }) => parseFloat(value))
+  @Transform(({ value }) => (value ? parseFloat(value) : undefined))
   @IsPositive()
   price: number;
 
   descripton: string;
 
-  @IsOptional()
-  @Transform(({ value }) => value === "1")
   limitQuantity: boolean;
 
-  @Transform(({ value }) => parseInt(value, 10))
+  @Transform(({ value }) => (value ? parseInt(value, 10) : undefined))
   @IsInt()
   @IsPositive()
   @ValidateIf((obj) => obj.limitQuantity === true)
   quantity: number;
 
-  @Transform(({ value }) => value === "1")
   refundEnabled: boolean;
 
-  @Transform(({ value }) => value === "1")
   hideQuantity: boolean;
 
-  @Transform(({ value }) => value === "1")
   hideSales: boolean;
 
   refundPolicy: string;
 
-  @Transform(({ value }) => value === "1")
   onPurchaseRedirect: boolean;
 
   @ValidateIf((obj) => obj.onPurchaseRedirect === true)

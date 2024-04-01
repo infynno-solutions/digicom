@@ -23,6 +23,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           },
           consumer: {
             groupId: 'mail-consumer',
+            sessionTimeout: 30000,
+            heartbeatInterval: 5000,
           },
         },
       },

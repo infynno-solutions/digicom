@@ -14,6 +14,8 @@ async function bootstrap() {
         },
         consumer: {
           groupId: 'mail-consumer',
+          sessionTimeout: 30000,
+          heartbeatInterval: 5000,
         },
       },
     },

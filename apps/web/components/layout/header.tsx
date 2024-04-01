@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { User } from "next-auth";
 import { signOut } from "next-auth/react";
 import {
@@ -11,12 +12,8 @@ import {
   LuPanelLeft,
 } from "react-icons/lu";
 import { menuItems } from "./sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from "@/components/ui/breadcrumb";
+import { generateBreadcrumbs } from "@/components/generate-breadcrumbs";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,6 +28,7 @@ interface HeaderProps {
 }
 
 const Header = ({ user }: HeaderProps) => {
+  const pathname = usePathname();
   const handleLogout = async () => await signOut();
 
   return (
@@ -64,13 +62,7 @@ const Header = ({ user }: HeaderProps) => {
           </nav>
         </SheetContent>
       </Sheet>
-      <Breadcrumb className="hidden md:flex">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      {generateBreadcrumbs(pathname)}
       <div className="relative ml-auto flex-1 md:grow-0">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

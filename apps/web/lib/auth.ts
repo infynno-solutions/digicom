@@ -35,8 +35,12 @@ export const authOptions: NextAuthOptions = {
           );
 
           const user = res.data.user;
+          const token = res.data.token;
 
-          return user;
+          return {
+            ...user,
+            token,
+          };
         } catch (e: any) {
           throw new Error(
             e?.response?.data?.message || "Something went wrong!!",
@@ -45,4 +49,13 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      return { ...token, ...user };
+    },
+    async session({ session, token }) {
+      session.user = token;
+      return session;
+    },
+  },
 };

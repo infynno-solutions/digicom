@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import ReactQueryProvider from "@/components/react-query-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -65,7 +66,9 @@ export default function RootLayout({
         )}
       >
         <Toaster />
-        <TooltipProvider>{children}</TooltipProvider>
+        <ReactQueryProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

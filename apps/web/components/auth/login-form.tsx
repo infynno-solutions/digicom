@@ -1,7 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { LuLoader } from "react-icons/lu";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -20,6 +25,10 @@ const loginSchema = z.object({
 });
 
 const LoginForm = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { toast } = useToast();
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -29,7 +38,19 @@ const LoginForm = () => {
   });
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
-    console.log("🚀 ~ handleLogin ~ values:", values);
+    setIsLoading(true);
+    await signIn("credentials", { ...values, redirect: false }).then((res) => {
+      setIsLoading(false);
+      if (!res) {
+        toast({ title: "Something went wrong!!", variant: "destructive" });
+        return;
+      }
+      if (res.error) {
+        toast({ title: res.error, variant: "destructive" });
+        return;
+      }
+      router.push("/dashboard");
+    });
   };
 
   return (
@@ -61,7 +82,13 @@ const LoginForm = () => {
           control={form.control}
           name="password"
         />
-        <Button type="submit">Login</Button>
+        <Button disabled={isLoading} type="submit">
+          {isLoading ? (
+            <LuLoader className="h-5 w-5 animate-spin" />
+          ) : (
+            <span>Login</span>
+          )}
+        </Button>
       </form>
     </Form>
   );

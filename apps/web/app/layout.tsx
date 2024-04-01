@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 
 const fontSans = localFont({
@@ -62,6 +63,7 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
+        <Toaster />
         {children}
       </body>
     </html>

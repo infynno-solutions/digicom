@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { db } from '@repo/db';
+import { CreateProductDto } from '@repo/shared';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  @MessagePattern('create-product')
+  async createProduct(
+    @Payload() message: CreateProductDto & { userId: string },
+  ): Promise<any> {
+    console.log('🚀 ~ AppController ~ message:', message);
+    const product = await db.product.create({ data: message });
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+    return {
+      message: 'Success',
+      product,
+    };
   }
 }

@@ -44,7 +44,7 @@ enum ProductStatus {
 model Product {
   id                 String            @id @default(cuid())
   title              String
-  description        String            @db.Text
+  description        String?           @db.Text
   thumbnail          String?
   price              Float             @default(0)
   currency           String

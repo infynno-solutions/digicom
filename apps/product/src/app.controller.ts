@@ -39,7 +39,12 @@ export class AppController {
       skip,
       where: {
         userId: message.userId,
-        title: message.search ? { contains: message.search } : undefined,
+        title: message.search
+          ? {
+              contains: message.search,
+              mode: 'insensitive',
+            }
+          : undefined,
       },
       orderBy:
         message.orderBy && message.order

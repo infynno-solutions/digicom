@@ -37,10 +37,19 @@ export class ProductService {
       );
   }
 
-  list(params?: { user: IAuthUser; page: number }) {
-    const { user, page } = params;
+  list(params?: {
+    user: IAuthUser;
+    page: number;
+    orderBy?: string;
+    order?: string;
+    search?: string;
+  }) {
+    const { user, page, order, orderBy, search } = params;
     return this.productClient
-      .send('list-products', JSON.stringify({ userId: user.id, page }))
+      .send(
+        'list-products',
+        JSON.stringify({ userId: user.id, page, orderBy, order, search }),
+      )
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

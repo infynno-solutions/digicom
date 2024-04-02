@@ -27,10 +27,19 @@ export class ProductController {
   }
 
   @Get('/')
-  listProducts(@Req() req: IRequestWithUser, @Query('page') page: number) {
+  listProducts(
+    @Req() req: IRequestWithUser,
+    @Query('page') page: number,
+    @Query('orderBy') orderBy: string,
+    @Query('order') order: string,
+    @Query('search') search: string,
+  ) {
     return this.productService.list({
       user: req.user,
       page,
+      order,
+      orderBy,
+      search,
     });
   }
 

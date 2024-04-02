@@ -6,6 +6,9 @@ import { CreateProductDto } from '@repo/shared';
 interface ListProductsMessage {
   userId: string;
   page?: number;
+  order?: string;
+  orderBy?: string;
+  search?: string;
 }
 
 interface GetProductMessage {
@@ -36,14 +39,29 @@ export class AppController {
       skip,
       where: {
         userId: message.userId,
+        title: message.search ? { contains: message.search } : undefined,
       },
-      orderBy: {
-        createdAt: 'desc',
+      orderBy:
+        message.orderBy && message.order
+          ? {
+              [message.orderBy]: message.order,
+            }
+          : {
+              createdAt: 'desc',
+            },
+    });
+    const total = await db.product.count({
+      where: {
+        userId: message.userId,
+        title: message.search ? { contains: message.search } : undefined,
       },
     });
+
     return {
       message: 'Success',
       products,
+      total,
+      totalPages: Math.ceil(total / 20),
     };
   }
 

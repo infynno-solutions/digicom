@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { PaginationState, SortingState } from "@tanstack/react-table";
 import { useState } from "react";
-import { env } from "@/env.mjs";
 import { api } from "@/lib/api";
 
 export const useListProducts = (): any => {
@@ -15,7 +14,7 @@ export const useListProducts = (): any => {
   const { data, isLoading } = useQuery<any>({
     queryKey: ["list-products", sorting, pagination, search],
     queryFn: () =>
-      api.get(`${env.NEXT_PUBLIC_API_URL}/product`, {
+      api.get(`/product`, {
         params: {
           orderBy: sorting?.[0]?.id,
           order: sorting?.[0]?.desc ? "desc" : "asc",

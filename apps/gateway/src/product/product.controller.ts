@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -10,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateProductDto } from '@repo/shared';
+import { CreateProductDto, UpdateProductDto } from '@repo/shared';
 import { IRequestWithUser } from 'src/auth/auth.interface';
 
 @Controller('product')
@@ -46,5 +47,14 @@ export class ProductController {
   @Get('/:id')
   getProduct(@Req() req: IRequestWithUser, @Param('id') id: string) {
     return this.productService.get({ user: req.user, id });
+  }
+
+  @Patch('/:id')
+  updateProduct(
+    @Req() req: IRequestWithUser,
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productService.update(id, updateProductDto, req.user);
   }
 }

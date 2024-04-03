@@ -1,7 +1,7 @@
 import { Controller, NotFoundException } from '@nestjs/common';
 import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { db } from '@repo/db';
-import { CreateProductDto } from '@repo/shared';
+import { CreateProductDto, UpdateProductDto } from '@repo/shared';
 
 interface ListProductsMessage {
   userId: string;
@@ -82,6 +82,27 @@ export class AppController {
     if (!product) {
       throw new RpcException(new NotFoundException('Product not found.'));
     }
+
+    return {
+      message: 'Success',
+      product,
+    };
+  }
+
+  @MessagePattern('update-product')
+  async updateProduct(
+    @Payload() message: UpdateProductDto & { userId: string; id: string },
+  ): Promise<{ message: string; product: any }> {
+    let product = await db.product.findUnique({ where: { id: message.id } });
+
+    if (!product) {
+      throw new RpcException(new NotFoundException('Product not found.'));
+    }
+
+    product = await db.product.update({
+      where: { id: message.id },
+      data: message,
+    });
 
     return {
       message: 'Success',

@@ -32,49 +32,80 @@ import {
   productSchema,
   useCreateProduct,
 } from "@/hooks/product/use-create-product";
+import { useUpdateProduct } from "@/hooks/product/use-update-product";
 import { cn } from "@/lib/utils";
+import { Product } from "@/types";
 
-const ProductForm = () => {
+interface ProductFormProps {
+  product?: Product;
+}
+
+const ProductForm = ({ product }: ProductFormProps) => {
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      currency: "USD",
-      price: "",
-      limitQuantity: false,
-      quantity: "",
-      hideQuantity: false,
-      hideSales: false,
-      onPurchaseRedirect: false,
-      redirectLink: "",
-      refundEnabled: false,
+      title: product?.title ?? "",
+      description: product?.description ?? "",
+      currency: product?.currency ?? "USD",
+      price: product?.price?.toString() ?? "",
+      limitQuantity: product?.limitQuantity ?? false,
+      quantity: product?.quantity?.toString() ?? "",
+      hideQuantity: product?.hideQuantity ?? false,
+      hideSales: product?.hideSales ?? false,
+      onPurchaseRedirect: product?.onPurchaseRedirect ?? false,
+      redirectLink: product?.redirectLink ?? "",
+      refundEnabled: product?.refundEnabled ?? false,
     },
   });
 
   const limitQuantity = form.watch("limitQuantity");
   const onPurchaseRedirect = form.watch("onPurchaseRedirect");
 
-  const { mutate, isPending } = useCreateProduct();
+  const { mutate: create, isPending: isCreating } = useCreateProduct();
+  const { mutate: update, isPending: isUpdating } = useUpdateProduct(
+    product?.id,
+  );
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleCreate = async (values: z.infer<typeof productSchema>) =>
-    mutate(values, {
-      onSuccess: (res: any) => {
-        toast({ title: res.data.message });
-        router.push("/dashboard/products");
-      },
-      onError: (err: any) => {
-        toast({ title: err?.response?.data?.message, variant: "destructive" });
-      },
-    });
+  const handleCreateUpdate = async (
+    values: z.infer<typeof productSchema>,
+    publish?: boolean,
+  ) =>
+    product
+      ? update(
+          { ...values, status: publish ? "PUBLISHED" : product.status },
+          {
+            onSuccess: (res: any) => {
+              toast({ title: res.data.message });
+              router.push("/dashboard/products");
+            },
+            onError: (err: any) => {
+              toast({
+                title: err?.response?.data?.message,
+                variant: "destructive",
+              });
+            },
+          },
+        )
+      : create(values, {
+          onSuccess: (res: any) => {
+            toast({ title: res.data.message });
+            router.push("/dashboard/products");
+          },
+          onError: (err: any) => {
+            toast({
+              title: err?.response?.data?.message,
+              variant: "destructive",
+            });
+          },
+        });
 
   return (
     <Form {...form}>
       <form
         className="mx-auto grid w-full flex-1 auto-rows-max gap-4"
-        onSubmit={form.handleSubmit(handleCreate)}
+        onSubmit={form.handleSubmit((values) => handleCreateUpdate(values))}
       >
         <div className="flex items-center gap-4">
           <Link
@@ -88,7 +119,7 @@ const ProductForm = () => {
             <span className="sr-only">Back</span>
           </Link>
           <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-            New Product
+            {product ? "Update" : "New"} Product
           </h1>
           <div className="hidden items-center gap-2 md:ml-auto md:flex">
             <Link
@@ -97,13 +128,29 @@ const ProductForm = () => {
             >
               Discard
             </Link>
-            <Button disabled={isPending} size="sm" type="submit">
-              {isPending ? (
+            <Button disabled={isCreating || isUpdating} size="sm" type="submit">
+              {isCreating || isUpdating ? (
                 <LuLoader className="h-5 w-5 animate-spin" />
               ) : (
                 <span>Save Product</span>
               )}
             </Button>
+            {product && (
+              <Button
+                disabled={isCreating || isUpdating}
+                size="sm"
+                type="button"
+                onClick={form.handleSubmit((values) =>
+                  handleCreateUpdate(values, true),
+                )}
+              >
+                {isCreating || isUpdating ? (
+                  <LuLoader className="h-5 w-5 animate-spin" />
+                ) : (
+                  <span>Publish Product</span>
+                )}
+              </Button>
+            )}
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">

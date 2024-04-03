@@ -9,8 +9,16 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import debounce from "lodash/debounce";
-import { LuArrowUpDown, LuLoader } from "react-icons/lu";
+import { useRouter } from "next/navigation";
+import { LuArrowUpDown, LuLoader, LuMoreHorizontal } from "react-icons/lu";
 import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
 import {
   Table,
@@ -24,6 +32,7 @@ import { useListProducts } from "@/hooks/product/use-list-products";
 import { Product } from "@/types";
 
 const ProductsList = () => {
+  const router = useRouter();
   const {
     data,
     isLoading,
@@ -84,6 +93,33 @@ const ProductsList = () => {
           {row.original.currency} {row.original.price}
         </div>
       ),
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="h-8 w-8 p-0" variant="ghost">
+                <span className="sr-only">Open menu</span>
+                <LuMoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(`/dashboard/products/${product.id}/edit`)
+                }
+              >
+                Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 

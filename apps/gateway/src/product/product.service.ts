@@ -15,6 +15,7 @@ export class ProductService {
     this.productClient.subscribeToResponseOf('list-products');
     this.productClient.subscribeToResponseOf('get-product');
     this.productClient.subscribeToResponseOf('update-product');
+    this.productClient.subscribeToResponseOf('delete-product');
     await this.productClient.connect();
   }
 
@@ -75,6 +76,16 @@ export class ProductService {
         'update-product',
         JSON.stringify({ ...updateProductDto, id, userId: user.id }),
       )
+      .pipe(
+        catchError((error) =>
+          throwError(() => new RpcException(error.response)),
+        ),
+      );
+  }
+
+  delete(id: string) {
+    return this.productClient
+      .send('delete-product', JSON.stringify({ id }))
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

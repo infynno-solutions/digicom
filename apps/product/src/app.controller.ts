@@ -109,4 +109,28 @@ export class AppController {
       product,
     };
   }
+
+  @MessagePattern('delete-product')
+  async deleteProduct(
+    @Payload() message: { id: string },
+  ): Promise<{ message: string }> {
+    const product = await db.product.findUnique({ where: { id: message.id } });
+
+    if (!product) {
+      throw new RpcException(new NotFoundException('Product not found.'));
+    }
+
+    await db.$transaction(async (prisma) => {
+      await prisma.productDelivery.deleteMany({
+        where: { productId: message.id },
+      });
+      await prisma.product.delete({
+        where: { id: message.id },
+      });
+    });
+
+    return {
+      message: 'Success',
+    };
+  }
 }

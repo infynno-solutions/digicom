@@ -11,12 +11,14 @@ import {
 import debounce from "lodash/debounce";
 import { useRouter } from "next/navigation";
 import { LuArrowUpDown, LuLoader, LuMoreHorizontal } from "react-icons/lu";
+
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
@@ -28,6 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { useToast } from "../ui/use-toast";
+import { useDeleteProduct } from "@/hooks/product/use-delete-product";
 import { useListProducts } from "@/hooks/product/use-list-products";
 import { Product } from "@/types";
 
@@ -40,11 +44,24 @@ const ProductsList = () => {
     setSorting,
     pagination,
     setPagination,
-    search,
     setSearch,
   } = useListProducts();
   const products = data?.data?.products;
   const totalPages = data?.data?.totalPages;
+  const { mutate } = useDeleteProduct();
+  const { toast } = useToast();
+  const handleDeleteProduct = (productId: string) =>
+    mutate(productId, {
+      onSuccess: (res: any) => {
+        toast({ title: res?.data?.message });
+      },
+      onError: (err: any) => {
+        toast({
+          title: err?.response?.data?.message || "Something went wrong!!",
+          variant: "destructive",
+        });
+      },
+    });
 
   const columns: ColumnDef<Product>[] = [
     {
@@ -60,6 +77,12 @@ const ProductsList = () => {
           </Button>
         );
       },
+      cell: ({ row }) => (
+        <div>
+          <div className="text-lg font-semibold">{row.original.title}</div>
+          <div className="text-xs">{row.original.id}</div>
+        </div>
+      ),
     },
     {
       accessorKey: "status",
@@ -115,6 +138,22 @@ const ProductsList = () => {
                 }
               >
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => {
+                  const result = confirm(
+                    "Are you sure you want to delete this product? This action cannot be reversed.",
+                  );
+
+                  if (result) {
+                    handleDeleteProduct(product.id);
+                  }
+                }}
+              >
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

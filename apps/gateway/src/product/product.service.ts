@@ -50,7 +50,7 @@ export class ProductService {
     return this.productClient
       .send(
         'list-products',
-        JSON.stringify({ userId: user.id, page, orderBy, order, search }),
+        JSON.stringify({ userId: user?.id, page, orderBy, order, search }),
       )
       .pipe(
         catchError((error) =>
@@ -62,7 +62,7 @@ export class ProductService {
   get(params?: { user: IAuthUser; id: string }) {
     const { user, id } = params;
     return this.productClient
-      .send('get-product', JSON.stringify({ userId: user.id, id }))
+      .send('get-product', JSON.stringify({ userId: user?.id, id }))
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),

@@ -16,10 +16,10 @@ import { CreateProductDto, UpdateProductDto } from '@repo/shared';
 import { IRequestWithUser } from 'src/auth/auth.interface';
 
 @Controller('product')
-@UseGuards(JwtAuthGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('/')
   createProduct(
     @Body() createProductDto: CreateProductDto,
@@ -50,6 +50,7 @@ export class ProductController {
     return this.productService.get({ user: req.user, id });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   updateProduct(
     @Req() req: IRequestWithUser,
@@ -59,6 +60,7 @@ export class ProductController {
     return this.productService.update(id, updateProductDto, req.user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   deleteProduct(@Param('id') id: string) {
     return this.productService.delete(id);

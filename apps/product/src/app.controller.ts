@@ -77,6 +77,15 @@ export class AppController {
         userId: message.userId,
         id: message.id,
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+      },
     });
 
     if (!product) {

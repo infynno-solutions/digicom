@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { LuHome, LuMoon, LuPackage, LuPackage2, LuSun } from "react-icons/lu";
+import {
+  LuCog,
+  LuHome,
+  LuMoon,
+  LuPackage,
+  LuPackage2,
+  LuSun,
+} from "react-icons/lu";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -26,6 +33,11 @@ export const menuItems = [
     href: "/dashboard/products",
     title: "Products",
     icon: <LuPackage className="h-5 w-5" />,
+  },
+  {
+    href: "/dashboard/settings/general",
+    title: "Settings",
+    icon: <LuCog className="h-5 w-5" />,
   },
 ];
 

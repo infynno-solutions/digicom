@@ -1,7 +1,8 @@
-import { Controller, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Controller } from '@nestjs/common';
 import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { db } from '@repo/db';
 import { ConnectStripeDto } from '@repo/shared';
+import Stripe from 'stripe';
 
 @Controller()
 export class AppController {
@@ -11,6 +12,15 @@ export class AppController {
   async connectStripe(
     @Payload() message: ConnectStripeDto & { userId: string },
   ) {
+    try {
+      const stripe = new Stripe(message.stripeSecretKey);
+      await stripe.accounts.list();
+    } catch (e) {
+      throw new RpcException(
+        new BadRequestException('Error validating your keys.'),
+      );
+    }
+
     await db.paymentAccount.upsert({
       where: {
         userId_provider: {

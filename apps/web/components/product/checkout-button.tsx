@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { useToast } from "../ui/use-toast";
 import { checkoutSchema, useCheckout } from "@/hooks/product/use-checkout";
 
 interface CheckoutFormProps {
@@ -31,10 +32,23 @@ const CheckoutForm = ({ product, user }: CheckoutFormProps) => {
     },
   });
 
+  const { toast } = useToast();
   const { mutate, isPending } = useCheckout();
 
   const handleCheckout = async (values: z.infer<typeof checkoutSchema>) =>
-    mutate(values);
+    mutate(values, {
+      onSuccess: (res: any) => {
+        if (res?.data?.url) {
+          window.location.href = res?.data?.url;
+        }
+      },
+      onError: (err: any) => {
+        toast({
+          title: err?.response?.data?.message || "Something went wrong!!",
+          variant: "destructive",
+        });
+      },
+    });
 
   return (
     <div className="p-4 md:w-1/3 md:p-6 lg:p-8">

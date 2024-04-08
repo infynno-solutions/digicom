@@ -20,6 +20,7 @@ model User {
   Token           Token[]
   Product         Product[]
   PaymentAccount  PaymentAccount[]
+  Order           Order[]
 }
 
 enum TokenType {
@@ -63,6 +64,7 @@ model Product {
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
   ProductDelivery    ProductDelivery[]
+  Order              Order[]
 }
 
 enum DeliveryType {
@@ -100,4 +102,32 @@ model PaymentAccount {
   updatedAt         DateTime        @updatedAt
 
   @@unique([userId, provider])
+}
+
+enum OrderStatus {
+  NOT_PAID
+  EXPIRED
+  BAD_CARD
+  BLOCKED
+  CANCELED
+  CHARGEBACK
+  PENDING
+  REFUNDED
+  COMPLETED
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  user             User        @relation(fields: [userEmail], references: [email])
+  userEmail        String
+  product          Product     @relation(fields: [productId], references: [id])
+  productId        String
+  price            Float
+  currency         String
+  paymentRequestId String?
+  status           OrderStatus @default(NOT_PAID)
+  delivered        Boolean     @default(false)
+  expiresAt        DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 }

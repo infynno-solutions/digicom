@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
 import { UserModule } from './user/user.module';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     ProductModule,
     UserModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

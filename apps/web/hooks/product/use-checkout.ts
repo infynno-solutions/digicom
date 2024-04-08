@@ -8,9 +8,9 @@ export const checkoutSchema = z.object({
   productId: z.string(),
 });
 
-export const useCheckout = (): any => {
+export const useCheckout = () => {
   return useMutation({
     mutationFn: (data: z.infer<typeof checkoutSchema>) =>
-      axios.post(`${env.NEXT_PUBLIC_API_URL}/checkout`, data),
+      axios.post(`${env.NEXT_PUBLIC_API_URL}/order`, data),
   });
 };

@@ -4,7 +4,10 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "prisma db seed"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
@@ -14,5 +17,8 @@
   },
   "dependencies": {
     "@prisma/client": "^5.11.0"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} ./prisma/seed.ts"
   }
 }

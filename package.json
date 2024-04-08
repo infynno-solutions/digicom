@@ -6,8 +6,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "db:push": "pnpm prisma db push",
-    "db:seed": "pnpm prisma db seed"
+    "db:push": "turbo db:push",
+    "db:seed": "turbo db:seed"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -20,9 +20,5 @@
   "packageManager": "pnpm@8.9.0",
   "engines": {
     "node": ">=18"
-  },
-  "prisma": {
-    "schema": "./packages/db/prisma/schema.prisma",
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} ./packages/db/prisma/seed.ts"
   }
 }
